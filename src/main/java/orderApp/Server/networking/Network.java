@@ -104,7 +104,7 @@ public class Network {
         return Main.DEVICE_TYPE;
     }
     protected static String getDeviceName() {
-        return "Names haven't been implemented yet.";
+        return Main.deviceName;
     }
 
 

@@ -12,6 +12,7 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import orderApp.Server.Main;
 import orderApp.Server.networking.packets.Header;
 import orderApp.Server.networking.packets.Packet;
 import orderApp.Server.networking.packets.Type2;
@@ -47,6 +48,7 @@ class Server extends Thread {
                 if (accepting) {
                     Socket s = socket.accept();
                     System.out.println("New connection accept " + s.getInetAddress());
+                    Main.reader.printAbove("New connection from: " + s.getInetAddress().getHostAddress());
 
                     // Try and find an existing connection with the socket.
                     boolean foundExisting = false;
@@ -92,13 +94,6 @@ class Server extends Thread {
         }
     }
 
-    protected void joinServer(InetAddress ip) throws IOException {
-        end();
-        Socket socket = new Socket();
-        socket.connect(new InetSocketAddress(ip, Network.PORT));
-        serverConnection = new Connection(socket, true, null);
-    }
-
     /**
      * Sends a new type 2 to all current connections. This is used for when data is changed by the server.
      */
@@ -124,15 +119,11 @@ class Server extends Thread {
         }
     }
 
-    protected void leaveServer() {
-        serverConnection.close(true);
-    }
-
     protected void removeConnection(Connection connection) {
         synchronized (connections) {
             connections.remove(connection);
+            System.out.println("Connections: " + connections);
         }
-        System.out.println("Connections: " + connections);
     }
 
     protected void end() {
