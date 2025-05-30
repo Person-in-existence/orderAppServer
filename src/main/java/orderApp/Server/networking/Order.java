@@ -17,9 +17,13 @@ public class Order {
     public Order(Order order) {
         this.customerName = order.customerName;
         this.orderID = order.orderID;
-        this.items = new ArrayList<>();
-        this.items.addAll(order.items);
 
+        if (order.items == null) {
+            this.items = null;
+        } else {
+            this.items = new ArrayList<>();
+            this.items.addAll(order.items);
+        }
     }
     public static class OrderItem {
         public final short itemID;

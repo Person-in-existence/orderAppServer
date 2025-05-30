@@ -296,7 +296,7 @@ class Connection extends Thread {
         Type5 packet = new Type5(header, in);
         long orderID = packet.getOrderID();
 
-        Network.removeOrderByID(orderID);
+        Network.removeOrderByID(orderID, this);
         // Send confirmation
         Type3 confirmPacket = new Type3(new Header(Network.NETWORK_VERSION_NUMBER, (short) 3, header.idempotencyToken), true);
         confirmPacket.send(out);
@@ -308,7 +308,7 @@ class Connection extends Thread {
         if (packet.getIsAdd()) {
             success = Network.addOrderChecksum(packet.getOrder(),packet.getChecksum());
         } else {
-            success = Network.removeOrderChecksum(packet.getOrder().orderID, packet.getChecksum());
+            success = Network.removeOrderChecksum(packet.getOrder().orderID, packet.getChecksum(), this);
         }
 
         if (!success) {

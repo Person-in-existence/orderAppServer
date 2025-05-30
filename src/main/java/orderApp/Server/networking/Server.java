@@ -121,6 +121,19 @@ class Server extends Thread {
         }
     }
 
+    protected void sendOrderRemovedUpdates(Order order, int checksum, Connection noSend) {
+        synchronized (connections) {
+            for (Connection connection: connections) {
+                // Dont send to the kitchen that did the remove
+                if (connection == noSend) {
+                    continue;
+                }
+                Type6 removePacket = new Type6(new Header(Network.NETWORK_VERSION_NUMBER, (short) 6, connection.getIdempotency()), order, checksum, false);
+                connection.sendPacket(removePacket);
+            }
+        }
+    }
+
     protected void removeConnection(Connection connection) {
         synchronized (connections) {
             connections.remove(connection);

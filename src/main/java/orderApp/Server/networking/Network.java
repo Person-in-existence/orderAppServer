@@ -52,8 +52,9 @@ public class Network {
         return orderID.incrementAndGet();
     }
 
-    public static void removeOrderByID(long orderID) {
+    static void removeOrderByID(long orderID, Connection noSend) {
         Main.removeOrderByID(orderID);
+        server.sendOrderRemovedUpdates(new Order(null, null, orderID), Main.makeChecksum(), noSend);
     }
     public static void setSessionData(SessionData data) {
         Main.setSessionData(data);
@@ -83,9 +84,9 @@ public class Network {
 
         return receivedChecksum == actualChecksum;
     }
-    public static boolean removeOrderChecksum(long orderID, int receivedChecksum) {
+    static boolean removeOrderChecksum(long orderID, int receivedChecksum, Connection noSend) {
         // Remove the order
-        removeOrderByID(orderID);
+        removeOrderByID(orderID, noSend);
 
         // Check checksum
         int actualChecksum = Main.makeChecksum();
