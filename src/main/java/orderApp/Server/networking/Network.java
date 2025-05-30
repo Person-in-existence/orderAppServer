@@ -10,7 +10,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,6 +26,8 @@ public class Network {
 
     public static void startSession() {
         if (!server.isRunning()) {
+            server.end();
+            server = new Server();
             server.setAccepting(true);
             server.start();
         } else {
@@ -34,6 +35,10 @@ public class Network {
             server.resendInfo(getSessionData());
         }
 
+    }
+
+    public static void resendData() {
+        server.resendInfo(getSessionData());
     }
 
     public static void endSession() {
@@ -52,6 +57,7 @@ public class Network {
     }
     public static void setSessionData(SessionData data) {
         Main.setSessionData(data);
+        server.resendInfo(data);
     }
 
     public static void setOrderData(OrderData data) {
@@ -61,7 +67,7 @@ public class Network {
         Main.addOrder(order);
 
         // Update waiters with amounts
-        server.sendWaiterUpdates(order, Main.makeChecksum(), connection);
+        server.sendUpdates(order, Main.makeChecksum(), connection);
     }
     public static boolean addOrderChecksum(Order order, int receivedChecksum) {
         // Check that the order isn't already added
@@ -87,7 +93,7 @@ public class Network {
         return receivedChecksum == actualChecksum;
     }
     public static boolean addRemoveItemsByAmount(Order amounts, int checksum) {
-        System.err.println("Received call to addRemoveItemsByAmount, not expected on a kitchen device. assert/return false");
+        System.err.println("Received call to addRemoveItemsByAmount, not expected on a server device. assert/return false");
         assert false;
         return false;
     }

@@ -35,11 +35,12 @@ public class CommandRegistry {
             }
             // If the command couldn't be found, tell the user no such command exists
             if (!commandFound) {
-                System.err.println("Command \"" + keyword + "\" does not exist.");
+                System.err.println("Command \"" + keyword + "\" does not exist. Use \"help\" to list all commands");
             }
         } catch (Exception e) {
             System.err.println("Unable to handle command. Please try again.");
             if (Main.debug) {
+                System.err.println(e.getClass());
                 System.err.println(e.getMessage());
                 System.err.println(Arrays.toString(e.getStackTrace()));
             }
@@ -54,7 +55,7 @@ public class CommandRegistry {
     }
     public static void listAllCommands(String[] ignored) {
         for (Command command: commands) {
-            System.out.println("\t" + command.name);
+            Main.reader.printAbove("\t" + command.name);
         }
     }
 }

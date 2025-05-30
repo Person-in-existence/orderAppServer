@@ -99,6 +99,9 @@ public class Main {
         }
         names = newNames;
         quantities = newQuantities;
+
+        // Resend data
+        Network.resendData();
         showData();
     }
     protected synchronized static void data(String[] args) {
@@ -190,6 +193,7 @@ public class Main {
         }
         names = newNames;
         quantities = newQuantities;
+        showData();
     }
     public static synchronized boolean isOrderWithID(long orderID) {
         for (Order order: orders.orders) {

@@ -4,8 +4,6 @@ package orderApp.Server.networking;
 
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -14,8 +12,8 @@ import java.util.Arrays;
 
 import orderApp.Server.Main;
 import orderApp.Server.networking.packets.Header;
-import orderApp.Server.networking.packets.Packet;
 import orderApp.Server.networking.packets.Type2;
+import orderApp.Server.networking.packets.Type6;
 import orderApp.Server.networking.packets.Type9;
 
 class Server extends Thread {
@@ -106,7 +104,7 @@ class Server extends Thread {
         }
     }
 
-    public void sendWaiterUpdates(Order order, int checksum, Connection noSend) {
+    public void sendUpdates(Order order, int checksum, Connection noSend) {
         synchronized (connections) {
             for (Connection connection: connections) {
                 // Don't send to the waiter that did the order - it has already updated
@@ -115,6 +113,10 @@ class Server extends Thread {
                 }
                 Type9 packet = new Type9(new Header(Network.NETWORK_VERSION_NUMBER, (short) 9, connection.getIdempotency()), order, checksum);
                 connection.sendPacket(packet);
+
+                // Kitchen one: it's dumb but we don't know device type so we just send both :D
+                Type6 kitchenPacket = new Type6(new Header(Network.NETWORK_VERSION_NUMBER, (short) 6, connection.getIdempotency()), order, checksum, true);
+                connection.sendPacket(kitchenPacket);
             }
         }
     }
@@ -128,12 +130,18 @@ class Server extends Thread {
 
     protected void end() {
         setAccepting(false);
+        running = false;
+
+        // Close the server socket (So we don't accept anything etc)
+        try {
+            socket.close();
+        } catch (IOException ignored) {}
         synchronized (connections) {
             for (Connection connection : connections) {
                 connection.close(true);
             }
         }
-        running = false;
+
     }
     public boolean isRunning() {
         return running;

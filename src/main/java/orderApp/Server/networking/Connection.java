@@ -234,7 +234,7 @@ class Connection extends Thread {
                 if (e.getMessage() != null) {
                     System.err.println(e.getMessage());
                 }
-                System.err.println(Arrays.toString(e.getStackTrace()));
+                System.err.println("Error in closing connection: " + Arrays.toString(e.getStackTrace()));
             }
         }
         open = false;
